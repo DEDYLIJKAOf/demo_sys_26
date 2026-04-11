@@ -120,3 +120,79 @@ hostnamectl set-hostname br-srv.au-team.irpo; exec bash
 
 <details>
 <summary><strong>Настройка адрессации</strong></summary>
+
+ISP
+```
+nano /etc/network/interfaces
+```
+```
+auto ens192
+iface ens192 inet dhcp
+
+auto ens224
+iface ens224 inet static
+address 172.16.1.1/28
+
+auto ens256
+iface ens256 inet static
+address 172.16.2.1/28
+```
+
+<img width="817" height="606" alt="image" src="https://github.com/user-attachments/assets/048f66a6-2674-4826-ad32-db410c31a04d" />
+
+```
+systemctl restart networking
+```
+```
+ip -c a
+```
+
+HQ-RTR
+```
+nano /etc/network/interfaces
+```
+```
+auto ens192
+iface ens192 inet static
+address 172.16.1.2/28
+gatewat 172.16.1.1
+
+auto ens224
+iface ens224 inet static
+address 192.168.1.1/28
+```
+
+<img width="767" height="611" alt="image" src="https://github.com/user-attachments/assets/48a24e6d-abf8-4239-b08a-e317c685fa51" />
+
+```
+systemctl restart networking
+```
+```
+ip -c a
+```
+
+BR-RTR
+```
+nano /etc/network/interfaces
+```
+```
+auto ens192
+iface ens92 inet static
+address 172.16.2.2/28
+gatewat 172.16.2.1
+
+auto ens224
+iface ens 224 inet static
+address 192.168.4.1/28
+```
+
+<img width="753" height="590" alt="image" src="https://github.com/user-attachments/assets/0fedfc67-b809-47d8-a0a0-07e9c230caf6" />
+
+```
+systemctl restart networking
+```
+
+```
+ip -c a
+```
+
