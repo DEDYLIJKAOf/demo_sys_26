@@ -196,3 +196,73 @@ systemctl restart networking
 ip -c a
 ```
 
+HQ-SRV
+```
+nano /etc/network/interfaces
+```
+```
+auto ens192
+iface ens192 inet static
+address 192.168.1.2/27
+gateway 192.168.1.1
+
+<img width="793" height="590" alt="image" src="https://github.com/user-attachments/assets/36cac43d-5392-4f75-b2b2-d99ec34f50c2" />
+
+```
+systemctl restart networking
+```
+
+```
+ip -c a
+```
+
+HQ-CLI
+```
+nano /etc/network/interfaces
+```
+
+```
+auto ens192
+iface ens192 inet dhcp
+```
+
+```
+systemctl restart networking
+```
+
+```
+ip -c a
+```
+
+BR-SRV
+```
+nano /etc/network/interfaces
+```
+```
+auto ens192
+iface ens192 inet static
+address 192.168.4.2/28
+gateway 192.168.4.1
+```
+```
+systemctl restart networking
+```
+```
+ip -c a
+```
+
+</details>
+
+---
+
+<a id="nat"></a>
+## 3.Настройка NAT на ISP
+
+<details>
+<summary>Задание</summary>
+На ISP настройте динамическую сетевую трансляцию портов для доступа к сети Интернет HQ-RTR и BR-RTR.
+</details>
+
+<details>
+<summary>Данное задание выполняеться на <strong>ISP</strong> машине</summary>
+
