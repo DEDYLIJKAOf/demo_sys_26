@@ -344,8 +344,7 @@ ping 8.8.8.8
 </details>
 
 <details>
-<summary>Задание выполняется на машинах <strong>HQ-SRV</strong>, <strong>BR-SRV</strong>, <strong>HQ-RTR</strong> и <strong>BR-RTR</strong></summary></br>
-
+<summary>Задание выполняется на машинах <strong>HQ-SRV</strong>, <strong>BR-SRV</strong>, <strong>HQ-RTR</strong> и <strong>BR-RTR</strong></summary>
 ### HQ-SRV
 
 Создание пользователя с иденфикатором 2026
