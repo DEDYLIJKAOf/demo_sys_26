@@ -55,7 +55,6 @@ sysctl -p
 
 ---
 
-<a id="именаустройств"></a>
 ## Задание 1. Настройка имен устройств
 
 <details>
@@ -99,8 +98,7 @@ hostnamectl set-hostname br-srv.au-team.irpo; exec bash
 
 ---
 
-<a id="Настройка адресации"></a>
-## Настройка адресации
+## Задание 2. Настройка адресации
 
 <details>
 <summary>Задание</summary>
@@ -271,8 +269,7 @@ ip -c a
 
 </details>
 
-<a id="nat"></a>
-## 3.Настройка NAT на ISP
+## Задание 3. Настройка NAT на ISP
 
 <details>
 <summary>Задание</summary>
@@ -328,8 +325,9 @@ ping 8.8.8.8
 
 <img width="673" height="242" alt="image" src="https://github.com/user-attachments/assets/a917a0a9-3857-4cee-b90d-fd3199192b1a" />
 
-<a id="пользователи"></a>
-##  4. Создание пользоватлей
+</details>
+
+## Задание 4. Создание пользоватлей
 
 <details>
 <summary>Задание</summary>
@@ -479,8 +477,7 @@ net_admin ALL=(ALL:ALL) NOPASSWD:ALL
 
 </details>
 
-<a id="vlan"></a>
-## 5. Настройка VLAN
+## Задание 5. Настройка VLAN
 
 <details>
 <summary>Задание</summary>
@@ -560,8 +557,7 @@ systemctl restart networking
 
 </details>
 
-<a id="ssh"></a>
-## 6. Настройка SSH
+## Задание 6. Настройка SSH
 
 <details>
 <summary>Задание</summary>
@@ -574,6 +570,9 @@ systemctl restart networking
 - Настройте баннер «Authorized access only».
 </details>
 
+<details>
+<summary>Решение</summary>
+    
 ### HQ-SRV и BR-SRV
 
 Устанавливаем ssh
@@ -619,7 +618,7 @@ systemctl restart sshd
 
 </details>
 
-## 7 Настройка GRE-туннеля
+## Задание 7 Настройка GRE-туннеля
 
 <details>
 <summary>Задание</summary>
@@ -742,3 +741,473 @@ ping 10.10.10.1
 
 </details>
 
+## Задание 8. Настройка OSPF
+
+<details>
+<summary>Задание</summary>
+
+Обеспечьте динамическую маршрутизацию на маршрутизаторах HQ-RTR и BR-RTR:
+
+сети одного офиса должны быть доступны из другого офиса и наоборот. Для обеспечения динамической маршрутизации.
+Используйте link state протокол на усмотрение участника:
+
+- Разрешите выбранный протокол только на интерфейсах ip туннеля
+- Маршрутизаторы должны делиться маршрутами только друг с другом
+- Обеспечьте защиту выбранного протокола посредством парольной
+защиты
+- Сведения о настройке и защите протокола занесите в отчёт
+</details>
+
+<details>
+<summary>Настройка OSPF</summary>
+
+### HQ-RTR
+
+Установка frr
+
+```
+apt install frr -y
+```
+
+Заходим в конфиг
+
+```
+nano /etc/frr/daemons
+```
+
+меняем ospfd = no на ospfd = yes
+
+<img width="828" height="608" alt="image" src="https://github.com/user-attachments/assets/1b590581-2753-4bf5-b73c-4c44c889ebbc" />
+
+Перезагружаем frr
+
+```
+systemctl restart frr
+```
+
+Добавляем в автозагрузку
+
+```
+systemctl enable --now frr
+```
+
+Переходим в интерфейс frr
+
+```
+vtysh
+```
+
+Настраиваем маршрутизацию
+
+```
+conf t
+```
+
+Режим конф. Ospfv2
+
+```
+router ospf
+```
+
+Переводим все интерфейсы в пассивный режим
+
+```
+passive-interface default
+```
+
+Добавляем зоны
+
+```
+network 192.168.1.0/27 area 0
+network 192.168.2.0/28 area 0
+network 192.168.3.0/29 area 0
+network 10.10.10.0/30 area 0
+```
+
+Включаем аунтефикацию
+
+```
+area 0 authentication
+```
+
+Выходим из режима конфигурации OSPFv2
+
+```
+exit
+```
+
+Переходим к интерфейсу gre1
+
+```
+int gre1
+```
+
+Разрешаем протокол
+
+```
+no ip ospf network broadcast
+```
+
+Переводим интерфейс в активный режим
+
+```
+no ip ospf passive
+```
+
+Вкючаем аунтефикацаию с открытым паролем "P@ssw0rd"
+
+```
+ip ospf authentication
+ip ospf authentication-key password
+```
+
+Выходим из режима конфигурации и gre1 и режима глобальной конфигурации
+
+```
+exit
+exit
+```
+
+Cохраняем текущую конфигурацию
+```bash
+write
+```
+Для выхода из <code>vtysh</code>
+```
+exit
+```
+Перезапускаем frr
+```
+systemctl restart frr
+```
+### BR-RTR
+
+становка frr
+
+```
+apt install frr -y
+```
+
+Заходим в конфиг
+
+```
+nano /etc/frr/daemons
+```
+
+меняем ospfd = no на ospfd = yes
+
+<img width="828" height="608" alt="image" src="https://github.com/user-attachments/assets/1b590581-2753-4bf5-b73c-4c44c889ebbc" />
+
+Перезагружаем frr
+
+```
+systemctl restart frr
+```
+
+Добавляем в автозагрузку
+
+```
+systemctl enable --now frr
+```
+
+Переходим в интерфейс frr
+
+```
+vtysh
+```
+
+Настраиваем маршрутизацию
+
+```
+conf t
+```
+
+Режим конф. Ospfv2
+
+```
+router ospf
+```
+
+Переводим все интерфейсы в пассивный режим
+
+```
+passive-interface default
+```
+
+Добавляем зоны
+
+```
+network 192.168.4.0/28 area 0
+network 10.10.10.0/30 area 0
+```
+
+Включаем аунтефикацию
+
+```
+area 0 authentication
+```
+
+Выходим из режима конфигурации OSPFv2
+
+```
+exit
+```
+
+Переходим к интерфейсу gre1
+
+```
+int gre1
+```
+
+Разрешаем протокол
+
+```
+no ip ospf network broadcast
+```
+
+Переводим интерфейс в активный режим
+
+```
+no ip ospf passive
+```
+
+Вкючаем аунтефикацаию с открытым паролем "P@ssw0rd"
+
+```
+ip ospf authentication
+ip ospf authentication-key password
+```
+
+Выходим из режима конфигурации и gre1 и режима глобальной конфигурации
+
+```
+exit
+exit
+```
+
+Cохраняем текущую конфигурацию
+
+```
+write
+```
+
+Для выхода из vtysh
+
+```
+exit
+```
+
+Перезапускаем frr
+
+```
+systemctl restart frr
+```
+
+## Задание 9. Настройка NAT на HQ-RTR и BR-RTR 
+
+<details>
+<summary>Задание</summary>
+    
+Настройка динамической трансляции адресов маршрутизаторах HQ-RTR и BR-RTR:
+
+- Настройте динамическую трансляцию адресов для обоих офисов в сторону ISP, все устройства в офисах должны иметь доступ к сети Интернет
+  
+</details>
+
+<details>
+<summary>Решение</summary>
+
+### HQ-RTR
+
+Открываем конфигурацию
+
+```
+nano /etc/nftables.conf
+```
+
+Прописываем:
+
+```
+table inet nat{
+  chain POSTROUTING {
+  type nat hook postrouting priority srcnat;
+  oifname "ens192" masquerade
+  }
+}
+```
+
+<img width="844" height="610" alt="image" src="https://github.com/user-attachments/assets/5bd6e183-c597-4645-976b-6289fbeeab58" />
+
+Перезапускаем службу nftables
+
+```
+systemctl restart nftables
+```
+
+Добавляем в автозагрузку
+
+```
+systemctl enable --now nftables
+```
+
+### BR-RTR
+
+Открываем конфигурацию
+
+```
+nano /etc/nftables.conf
+```
+
+Прописываем:
+
+```
+table inet nat{
+  chain POSTROUTING {
+  type nat hook postrouting priority srcnat;
+  oifname "ens192" masquerade
+  }
+}
+```
+
+<img width="844" height="610" alt="image" src="https://github.com/user-attachments/assets/5bd6e183-c597-4645-976b-6289fbeeab58" />
+
+Перезапускаем службу nftables
+
+```
+systemctl restart nftables
+```
+
+Добавляем в автозагрузку
+
+```
+systemctl enable --now nftables
+```
+
+</details>
+
+## Задание 10. Настройка DHCP 
+
+<details>
+<summary>Задание</summary>
+
+Настройте протокол динамической конфигурации хостов для сети в
+сторону HQ-CLI:
+- Настройте нужную подсеть
+- В качестве сервера DHCP выступает маршрутизатор HQ-RTR
+- Клиентом является машина HQ-CLI
+- Исключите из выдачи адрес маршрутизатора
+- Адрес шлюза по умолчанию – адрес маршрутизатора HQ-RTR
+- Адрес DNS-сервера для машины HQ-CLI – адрес сервера HQ-SRV
+- DNS-суффикс – au-team.irpo
+- Сведения о настройке протокола занесите в отчёт.
+
+</details>
+
+<summary>Решение</summary>
+
+Сначала нужно проверить resolv.conf
+
+```
+nano /etc/resolv.conf
+```
+
+Должно быть
+
+```
+nameserver 8.8.8.8
+```
+
+## 10. Настройка DHCP
+
+<details>
+<summary>Задание</summary>
+
+Настройте протокол динамической конфигурации хостов для сети в
+сторону HQ-CLI:
+- Настройте нужную подсеть
+- В качестве сервера DHCP выступает маршрутизатор HQ-RTR
+- Клиентом является машина HQ-CLI
+- Исключите из выдачи адрес маршрутизатора
+- Адрес шлюза по умолчанию – адрес маршрутизатора HQ-RTR
+- Адрес DNS-сервера для машины HQ-CLI – адрес сервера HQ-SRV
+- DNS-суффикс – au-team.irpo
+- Сведения о настройке протокола занесите в отчёт.
+
+</details>
+
+<details>
+<summary>Решение</summary>
+
+### HQ-RTR
+
+На HQ-RTR НУЖНО ПРОВЕРИТЬ ФАЙЛ /etc/resolv.conf
+
+```
+nameserver 8.8.8.8
+```
+Сначало необходимо скачать пакет DHCP-сервера командой
+
+```
+apt install isc-dhcp-server -y
+```
+Далее нужно перейти к файлу конфигурации
+
+```
+nano /etc/dhcp/dhcpd.conf
+```
+
+```
+subnet 192.168.200.0 netmask 255.255.255.240 {
+  range 192.168.200.2 192.168.200.14;
+  option domain-name-servers 192.168.100.62;
+  option domain-name "au-team.irpo";
+  option routers 192.168.200.1;
+}
+```
+
+<img width="825" height="610" alt="image" src="https://github.com/user-attachments/assets/15f75ebf-2dab-49db-af8f-1da8f87b403a" />
+
+Далее идем в /etc/default/isc-dhcp-server
+
+```
+nano /etc/default/isc-dhcp-server
+```
+
+Прописываем там
+
+```
+INTERFACESv4="ens224:1"
+```
+
+Рестартим и в автозагрузку
+
+```
+systemctl start isc-dhcp-server
+systemctl enable --now isc-dhcp-server
+```
+
+### HQ-CLI
+
+```
+nano /etc/network/interfaces
+```
+
+В нем меняем интерфейсы
+
+на этот
+
+```
+auto ens192
+iface ens192 inet dhcp
+```
+Далее перезапускаем сетевой интерфейс 
+
+```
+systemctl restart networking
+```
+Проверка
+
+```
+ip -c a
+```
+</details>
