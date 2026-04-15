@@ -1134,7 +1134,7 @@ subnet 192.168.200.0 netmask 255.255.255.240 {
 }
 ```
 
-<img width="825" height="610" alt="image" src="https://github.com/user-attachments/assets/15f75ebf-2dab-49db-af8f-1da8f87b403a" />
+<img width="814" height="595" alt="image" src="https://github.com/user-attachments/assets/fc29454f-d22c-49ed-8036-4778df539d70" />
 
 Далее идем в /etc/default/isc-dhcp-server
 
