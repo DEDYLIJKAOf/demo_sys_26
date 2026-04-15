@@ -1126,15 +1126,16 @@ nano /etc/dhcp/dhcpd.conf
 ```
 
 ```
-subnet 192.168.200.0 netmask 255.255.255.240 {
-  range 192.168.200.2 192.168.200.14;
-  option domain-name-servers 192.168.100.2;
+subnet 192.168.2.0 netmask 255.255.255.240 {
+  range 192.168.2.4 192.168.2.14;
+  option domain-name-servers 192.168.1.2;
   option domain-name "au-team.irpo";
-  option routers 192.168.200.1;
+  option routers 192.168.2.1;
 }
 ```
 
-<img width="814" height="595" alt="image" src="https://github.com/user-attachments/assets/fc29454f-d22c-49ed-8036-4778df539d70" />
+<img width="519" height="170" alt="image" src="https://github.com/user-attachments/assets/c2b1945e-7f81-4aa8-bdd4-e2c3b94e75a6" />
+
 
 Далее идем в /etc/default/isc-dhcp-server
 
@@ -1145,7 +1146,7 @@ nano /etc/default/isc-dhcp-server
 Прописываем там
 
 ```
-INTERFACESv4="ens224.200"
+INTERFACESv4="ens224:1"
 ```
 
 Рестартим и в автозагрузку
