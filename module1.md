@@ -158,7 +158,7 @@ nano /etc/network/interfaces
 auto ens192
 iface ens192 inet static
 address 172.16.1.2/28
-gatewat 172.16.1.1
+gateway 172.16.1.1
 
 auto ens224
 iface ens224 inet static
