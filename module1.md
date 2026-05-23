@@ -183,12 +183,12 @@ nano /etc/network/interfaces
 
 ```
 auto ens192
-iface ens92 inet static
+iface ens192 inet static
 address 172.16.2.2/28
 gateway 172.16.2.1
 
 auto ens224
-iface ens 224 inet static
+iface ens224 inet static
 address 192.168.4.1/28
 ```
 
